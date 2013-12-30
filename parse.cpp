@@ -33,7 +33,7 @@ void splitString(const std::string &txt, std::vector<std::string> &strs, char ch
     }
 }
 
-void parseVertice(const std::string & line) {
+void parseAndPrintLine(const std::string & line, const std::string & coordinateType){
     std::vector<std::string> parsed;
     splitString(line, parsed, ' ');
     if(parsed.size() != 4){
@@ -42,7 +42,7 @@ void parseVertice(const std::string & line) {
     double double_x = ::atof(parsed[1].c_str());
     double double_y = ::atof(parsed[2].c_str());
     double double_z = ::atof(parsed[3].c_str());
-    std::cout << "v "<< double_x<< " "<< double_y << " "<<double_z << std::endl;
+    std::cout << coordinateType << " "<< double_x<< " "<< double_y << " "<<double_z << std::endl;
 }
 
 void parsePolyLine(const std::string & line){
@@ -69,20 +69,8 @@ void parsePolyLine(const std::string & line){
     }
 }
 
-void parseVertexNormals(const std::string & line) {
-    std::vector<std::string> parsed;
-    splitString(line, parsed, ' ');
-    if(parsed.size() != 4){
-        std::cout << "error parsing vert: " << line << std::endl;
-    }
-    double double_x = ::atof(parsed[1].c_str());
-    double double_y = ::atof(parsed[2].c_str());
-    double double_z = ::atof(parsed[3].c_str());
-    std::cout << "vn "<< double_x<< " "<< double_y << " "<<double_z << std::endl;
-}
-
 int main (int argc, char* argv[]) {
-    std::ifstream myfile ("minicooper.obj");
+    std::ifstream myfile ("models/minicooper.obj");
     if (myfile.is_open())
     {
         std::string line; 
@@ -90,13 +78,16 @@ int main (int argc, char* argv[]) {
         {
             //std::cout<<line<<"\n";
             if(line[0] == 'v' && line[1] == 'n'){
-                parseVertexNormals(line);
+                parseAndPrintLine(line, "vn");
+            }
+            else if(line[0] == 'v' && line[1] == 't'){
+                parseAndPrintLine(line, "vt");
             }
             else if(line[0] == 'f'){
                 parsePolyLine(line);
             }
             else if(line[0] == 'v'){
-                parseVertice(line);
+                parseAndPrintLine(line, "v");
             }
         }
     }

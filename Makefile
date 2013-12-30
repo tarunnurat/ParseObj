@@ -10,3 +10,4 @@ $(EXE): parse.cpp $(wildcard *.h)
 
 clean:
 	-rm -rf $(EXE) *.o
+	-rm -f *.obj
