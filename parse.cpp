@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <vector>
+#include <stdio.h>
 
 class tridata {
   public:
@@ -33,7 +34,7 @@ void splitString(const std::string &txt, std::vector<std::string> &strs, char ch
     }
 }
 
-void parseAndPrintLine(const std::string & line, const std::string & coordinateType){
+void parseAndPrintLine(const std::string & line, const char * coordinateType){
     std::vector<std::string> parsed;
     splitString(line, parsed, ' ');
     if(parsed.size() != 4){
@@ -42,7 +43,9 @@ void parseAndPrintLine(const std::string & line, const std::string & coordinateT
     double double_x = ::atof(parsed[1].c_str());
     double double_y = ::atof(parsed[2].c_str());
     double double_z = ::atof(parsed[3].c_str());
+    
     std::cout << coordinateType << " "<< double_x<< " "<< double_y << " "<<double_z << std::endl;
+    //printf("%s %a %a %a\n", coordinateType, double_x, double_y, double_z); 
 }
 
 void parsePolyLine(const std::string & line){
