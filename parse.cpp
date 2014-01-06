@@ -2,6 +2,7 @@
 #include <fstream>
 #include <vector>
 #include <stdio.h>
+#include <cstring>
 
 class tridata {
   public:
@@ -34,7 +35,7 @@ void splitString(const std::string &txt, std::vector<std::string> &strs, char ch
     }
 }
 
-void parseAndPrintLine(const std::string & line, const char * coordinateType, std::ofstream & out_file) {
+void parseAndPrintLine(const std::string & line, const char * coordinateType, FILE * f) {
     std::vector<std::string> parsed;
     splitString(line, parsed, ' ');
     if(parsed.size() != 4){
@@ -46,17 +47,22 @@ void parseAndPrintLine(const std::string & line, const char * coordinateType, st
     
     //out_file << coordinateType << " "<< float_x << " "<< float_y << " "<<float_z << std::endl;
 
+    /*
     out_file << coordinateType << " ";
     out_file << float_x;
     out_file << " ";
-    out_file << float_y;
-    out_file << " ";
+    out_file << float_y; out_file << " ";
     out_file << float_z;
     out_file << std::endl;
+    */
+    fwrite(coordinateType, strlen(coordinateType), sizeof(char), f);
+    fwrite((char*)&float_x, sizeof(float), 1, f);
+    fwrite((char*)&float_y, sizeof(float), 1, f);
+    fwrite((char*)&float_z, sizeof(float), 1, f);
     //printf("%s %a %a %a\n", coordinateType, float_x, float_y, float_z); 
 }
 
-void parsePolyLine(const std::string & line, std::ofstream & out_file){
+void parsePolyLine(const std::string & line, FILE * f){
     std::vector<std::string> spaceSplits;
     splitString(line, spaceSplits, ' ');
     std::vector<std::string> rep;
@@ -71,46 +77,61 @@ void parsePolyLine(const std::string & line, std::ofstream & out_file){
     }
 
     int num_triangles = num_verts - 2;
-    for(int i = 0; i < num_triangles; i++){
+    for(int i = 0; i < num_triangles; i++) {
         tridata td;
     	td.v[0]=indicies[0];
     	td.v[1]=indicies[1+i];
     	td.v[2]=indicies[2+i];
         //out_file << "f " << td.v[0] << " " << td.v[1] << " " << td.v[2] << std::endl;
-        out_file << "f ";
-        out_file << td.v[0];
-        out_file << " ";
-        out_file << td.v[1];
-        out_file << " ";
-        out_file << td.v[2];
-        out_file << std::endl;
+    fwrite("f", strlen("f"), sizeof(char), f);
+    fwrite((char*)&td.v[0], sizeof(float), 1, f);
+    fwrite((char*)&td.v[1], sizeof(float), 1, f);
+    fwrite((char*)&td.v[2], sizeof(float), 1, f);
+    /*
+    out_file << "f ";
+    out_file << td.v[0];
+    out_file << " ";
+    out_file << td.v[1];
+    out_file << " ";
+    out_file << td.v[2];
+    out_file << std::endl;
+    */
     }
 }
 
 int main () {
-    std::ifstream myfile ("models/minicooper.obj");
+    std::ifstream myfile ("models/cube.obj");
     if (myfile.is_open())
     {
+        /*
         std::ofstream out_file;
         out_file.open("out.obj");
+        */
+        FILE * f = fopen("out.obj", "w");
+        if (f == NULL)
+        {
+            printf("Error opening file!\n");
+            exit(1);
+        }
         std::string line; 
         while ( getline (myfile,line) )
         {
             //std::cout<<line<<"\n";
             if(line[0] == 'v' && line[1] == 'n'){
-                parseAndPrintLine(line, "vn", out_file);
+                parseAndPrintLine(line, "vn", f);
             }
             else if(line[0] == 'v' && line[1] == 't'){
-                parseAndPrintLine(line, "vt", out_file);
+                parseAndPrintLine(line, "vt", f);
             }
             else if(line[0] == 'f'){
-                parsePolyLine(line, out_file);
+                parsePolyLine(line, f);
             }
             else if(line[0] == 'v'){
-                parseAndPrintLine(line, "v", out_file);
+                parseAndPrintLine(line, "v", f);
             }
         }
-        out_file.close();
+        fclose(f);
+        //out_file.close();
     }
     return 0;
 }
